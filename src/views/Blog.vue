@@ -20,16 +20,10 @@
         </div>
         <div class="mt-6 w-full">
 
-            <nav aria-label="Page navigation" class="">
-                <ul class="inline-flex -space-x-px">
-                    <li>
-                        <a href="#" class="py-2 px-3 ml-0 leading-tight bg-white rounded-l-lg border border-gray-300 hover:text-white hover:bg-purple-600">Older Posts</a>
-                    </li>
-                    <li>
-                        <a href="#" class="py-2 px-3 leading-tight bg-white rounded-r-lg border border-gray-300 hover:text-white hover:bg-purple-600">Newer Posts</a>
-                    </li>
-                </ul>
-            </nav>
+            <Pagination :pagination="pagination"
+            @prev="--queryOptions.page; getPosts();"
+            @next="queryOptions.page++; getPosts();"
+             />
 
         </div>
     </div>
@@ -37,6 +31,7 @@
 
 <script>
     import axios from "axios";
+    import Pagination from "../components/Pagination.vue"
 
     export default {
         name: 'Blog',
@@ -48,18 +43,39 @@
                     page: 1,
                     _embed: true
                 },
+                pagination: {
+                    prevPage: '',
+                    nextPage: '',
+                    totalPages: '',
+                    from: '',
+                    to: '',
+                    total: '',
+                },
                 posts: []
             }
         },
+        components: {
+    "Pagination": Pagination,
+    Pagination
+},
         methods: {
             getPosts() {
                 axios.get(this.postsUrl, { params: this.queryOptions })
                     .then(res => {
                         this.posts = res.data
+                        this.configPagination(res.headers)
                     })
                     .catch(err => {
                         console.log(err)
                     })
+            },
+            configPagination(headers) {
+                this.pagination.total = +headers['x-wp-total']
+                this.pagination.totalPages = +headers['x-wp-totalpages']
+                this.pagination.from = this.pagination.total ? ((this.queryOptions.page - 1) * this.queryOptions.per_page) + 1 : ' '
+                this.pagination.to = (this.queryOptions.page * this.queryOptions.per_page) > this.pagination.total ? this.pagination.total : this.queryOptions.page * this.queryOptions.per_page
+                this.pagination.prevPage = this.queryOptions.page > 1 ? this.queryOptions.page : ''
+                this.pagination.nextPage = this.queryOptions.page < this.pagination.totalPages ? this.queryOptions.page + 1 : ''
             }
         },
         mounted() {
