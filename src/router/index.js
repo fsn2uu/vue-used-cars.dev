@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import BlogView from '../views/Blog.vue'
+import BlogDetail from '../views/BlogDetail.vue'
 import Staff from '../views/Staff.vue'
 import Inventory from '../views/Inventory.vue'
 import CarDetail from '../views/CarDetail.vue'
@@ -30,6 +31,11 @@ const routes = [
     path: '/blog',
     name: 'blog',
     component: BlogView
+  },
+  {
+    path: '/blog/:slug',
+    name: 'blog-details',
+    component: BlogDetail
   },
   {
     path: '/inventory',
